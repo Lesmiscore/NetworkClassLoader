@@ -114,6 +114,11 @@ public class NetworkClassLoader extends ClassLoader {
 		this(baseAddress, null, true, null, ml);
 	}
 
+	public NetworkClassLoader(String baseAddress) {
+		// TODO 自動生成されたコンストラクター・スタブ
+		this(baseAddress, null, true, null, null);
+	}
+
 	@Override
 	protected Class<?> loadClass(String name, boolean resolve)
 			throws ClassNotFoundException {
