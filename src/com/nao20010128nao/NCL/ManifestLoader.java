@@ -52,7 +52,7 @@ public abstract class ManifestLoader {
 		public List<String> getFilesList(BufferedReader reader,
 				InputStream original, String source) throws IOException {
 			// TODO 自動生成されたメソッド・スタブ
-			ArrayList<String> list = new ArrayList<>();
+			ArrayList<String> list = new ArrayList<String>();
 			String line = null;
 			while (true) {
 				line = reader.readLine();
@@ -89,7 +89,7 @@ public abstract class ManifestLoader {
 		public List<String> getFilesList(BufferedReader reader,
 				InputStream original, String source) throws IOException {
 			// TODO 自動生成されたメソッド・スタブ
-			ArrayList<String> list = new ArrayList<>();
+			ArrayList<String> list = new ArrayList<String>();
 			String line = null;
 			while (true) {
 				line = reader.readLine();
