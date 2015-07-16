@@ -157,7 +157,7 @@ public class NetworkClassLoader extends ClassLoader {
 	@Override
 	protected URL findResource(String name) {
 		// TODO 自動生成されたメソッド・スタブ
-		String path = combinePath(baseAddress, name.replace('.', '/'));
+		String path = combinePath(baseAddress, name);
 		try {
 			return new URL(path);
 		} catch (MalformedURLException e) {
