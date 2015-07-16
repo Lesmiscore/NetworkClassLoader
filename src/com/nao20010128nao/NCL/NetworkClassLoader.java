@@ -141,12 +141,15 @@ public class NetworkClassLoader extends ClassLoader {
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
 		// TODO 自動生成されたメソッド・スタブ
+		if (cache.containsKey(name))
+			return cache.get(name);
 		String path = combinePath(baseAddress, name.replace('.', '/'))
 				+ ".class";
 		byte[] buf;
 		try {
 			Class<?> c = defineClass(name, buf = download(path), 0, buf.length);
 			addResource(name.replace('.', '/') + ".class");
+			cache.put(name, c);
 			return c;
 		} catch (Throwable ex) {
 			// TODO 自動生成された catch ブロック
@@ -159,7 +162,7 @@ public class NetworkClassLoader extends ClassLoader {
 		// TODO 自動生成されたメソッド・スタブ
 		String path = combinePath(baseAddress, name);
 		try {
-			return new URL(path);
+			return addResource(new URL(path), name);
 		} catch (MalformedURLException e) {
 			// TODO 自動生成された catch ブロック
 			return null;
@@ -240,5 +243,25 @@ public class NetworkClassLoader extends ClassLoader {
 		} catch (IOException e) {
 			return;
 		}
+	}
+
+	private URL addResource(URL url, String rawPath) {
+		InputStream is = null;
+		try {
+			is = url.openStream();
+			is.read(new byte[10]);// it's for test!
+			addResource(rawPath);
+		} catch (IOException e) {
+			// TODO 自動生成された catch ブロック
+		} finally {
+			try {
+				if (is != null)
+					is.close();
+			} catch (IOException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+		}
+		return url;
 	}
 }
