@@ -194,8 +194,8 @@ public class NetworkClassLoader extends ClassLoader {
 		};
 	}
 
-	private byte[] download(String combinedName) throws MalformedURLException,
-			IOException {
+	private byte[] downloadInternal(String combinedName)
+			throws MalformedURLException, IOException {
 		InputStream is = new URL(combinedName).openStream();
 		is = converter.convert(is, combinedName);
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -208,6 +208,17 @@ public class NetworkClassLoader extends ClassLoader {
 			bos.write(buf, 0, r);
 		}
 		return bos.toByteArray();
+	}
+
+	private byte[] download(String combinedName) {
+		for (int i = 0; i < 10; i++) {
+			try {
+				return downloadInternal(combinedName);
+			} catch (Throwable e) {
+
+			}
+		}
+		return null;
 	}
 
 	static String combinePath(String main, String dir) {
