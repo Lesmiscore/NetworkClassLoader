@@ -19,6 +19,7 @@ import java.util.Set;
 public class NetworkClassLoader extends ClassLoader {
 	static Map<Integer, String> combineCache = new HashMap<>();
 
+	NCLPerformanceCounter perfCount = NCLPerformanceCounter.getFor(this);
 	Set<String> resources = new HashSet<>();
 	String baseAddress;
 	boolean delegate;
@@ -147,17 +148,26 @@ public class NetworkClassLoader extends ClassLoader {
 		// TODO 自動生成されたメソッド・スタブ
 		if (cache.containsKey(name))
 			return cache.get(name);
-		String path = combinePath(baseAddress, name.replace('.', '/'))
-				+ ".class";
-		byte[] buf;
+		long a = System.currentTimeMillis();
 		try {
-			Class<?> c = defineClass(name, buf = download(path), 0, buf.length);
-			addResource(name.replace('.', '/') + ".class");
-			cache.put(name, c);
-			return c;
-		} catch (Throwable ex) {
-			// TODO 自動生成された catch ブロック
-			throw new ClassNotFoundException("failed to load " + name, ex);
+			String path = combinePath(baseAddress, name.replace('.', '/'))
+					+ ".class";
+			byte[] buf;
+			try {
+				Class<?> c = defineClass(name, buf = download(path), 0,
+						buf.length);
+				addResource(name.replace('.', '/') + ".class");
+				cache.put(name, c);
+				return c;
+			} catch (Throwable ex) {
+				// TODO 自動生成された catch ブロック
+				throw new ClassNotFoundException("failed to load " + name, ex);
+			}
+		} finally {
+			long b = System.currentTimeMillis();
+			long elapsed = b - a;
+			if (cache.containsKey(name))
+				perfCount.increaseLCE(elapsed);
 		}
 	}
 
@@ -200,18 +210,31 @@ public class NetworkClassLoader extends ClassLoader {
 
 	private byte[] downloadInternal(String combinedName)
 			throws MalformedURLException, IOException {
-		InputStream is = new URL(combinedName).openStream();
-		is = converter.convert(is, combinedName);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		int r = 0;
-		byte[] buf = new byte[10000];
-		while (true) {
-			r = is.read(buf);
-			if (r <= 0)
-				break;
-			bos.write(buf, 0, r);
+		long a = System.currentTimeMillis();
+		byte[] array = null;
+		;
+		try {
+			InputStream is = new URL(combinedName).openStream();
+			is = converter.convert(is, combinedName);
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			int r = 0;
+			byte[] buf = new byte[10000];
+			while (true) {
+				r = is.read(buf);
+				if (r <= 0)
+					break;
+				bos.write(buf, 0, r);
+			}
+			return array = bos.toByteArray();
+		} finally {
+			long b = System.currentTimeMillis();
+			long elapsed = b - a;
+			if (array != null) {
+				perfCount.increaseDE(elapsed);
+				perfCount.increaseDF(1);
+				perfCount.increaseDB(array.length);
+			}
 		}
-		return bos.toByteArray();
 	}
 
 	private byte[] download(String combinedName) {
