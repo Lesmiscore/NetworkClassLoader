@@ -25,6 +25,7 @@ public class NetworkClassLoader extends ClassLoader {
 	ResourceConverter converter;
 	ManifestLoader mLoader;
 	Map<String, Class<?>> cache = new HashMap<>();
+	volatile boolean preloadStop = false;
 
 	public NetworkClassLoader(String baseAddress, ClassLoader parent,
 			boolean delegate, ResourceConverter rc, ManifestLoader ml) {
@@ -288,5 +289,37 @@ public class NetworkClassLoader extends ClassLoader {
 		// TODO 自動生成されたメソッド・スタブ
 		return super.hashCode() ^ baseAddress.hashCode()
 				^ ((Boolean) delegate).hashCode();
+	}
+
+	public int getCacheSize() {
+		return cache.size();
+	}
+
+	public void startPreloadClassesBackground() {
+		preloadStop = false;
+		new Thread() {
+			@Override
+			public void run() {
+				// TODO 自動生成されたメソッド・スタブ
+				for (String res : resources) {
+					if (preloadStop)
+						return;
+					if (res.endsWith(".class")) {
+						String className = res.substring(0, res.length() - 6)
+								.replace('/', '.');
+						if (!cache.containsKey(className)) {
+							try {
+								findClass(className);
+							} catch (ClassNotFoundException e) {
+							}
+						}
+					}
+				}
+			}
+		}.start();
+	}
+
+	public void stopPreloadClassesBackground() {
+		preloadStop = true;
 	}
 }
