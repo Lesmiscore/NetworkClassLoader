@@ -232,7 +232,7 @@ public class NetworkClassLoader extends ClassLoader {
 		while (trimmedMain.endsWith("/") | trimmedMain.endsWith("\\"))
 			trimmedMain = trimmedMain.substring(0, trimmedMain.length() - 1);
 		String trimmedDir = dir;
-		while (trimmedDir.startsWith("/") | trimmedDir.endsWith("\\"))
+		while (trimmedDir.startsWith("/") | trimmedDir.startsWith("\\"))
 			trimmedDir = trimmedDir.substring(1);
 		return combineCache.put(hash,
 				(trimmedMain + "/" + trimmedDir).replace('\\', '/'));
