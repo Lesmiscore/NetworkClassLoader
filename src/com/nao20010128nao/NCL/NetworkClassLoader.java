@@ -13,9 +13,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class NetworkClassLoader extends ClassLoader {
+	static Map<Integer, String> combineCache = new HashMap<>();
+
 	Set<String> resources = new HashSet<>();
 	String baseAddress;
 	boolean delegate;
@@ -27,7 +30,7 @@ public class NetworkClassLoader extends ClassLoader {
 			boolean delegate, ResourceConverter rc, ManifestLoader ml) {
 		// TODO 自動生成されたコンストラクター・スタブ
 		super(parent == null ? getSystemClassLoader() : parent);
-		this.baseAddress = baseAddress;
+		Objects.requireNonNull(this.baseAddress = baseAddress);
 		this.delegate = delegate;
 		converter = rc == null ? ResourceConverter.NULL_CONVERTER : rc;
 		mLoader = ml == null ? ManifestLoader.NULL_LOADER : ml;
@@ -222,13 +225,17 @@ public class NetworkClassLoader extends ClassLoader {
 	}
 
 	static String combinePath(String main, String dir) {
+		int hash = main.hashCode() ^ dir.hashCode();
+		if (combineCache.containsKey(hash))
+			return combineCache.get(hash);
 		String trimmedMain = main;
 		while (trimmedMain.endsWith("/") | trimmedMain.endsWith("\\"))
 			trimmedMain = trimmedMain.substring(0, trimmedMain.length() - 1);
 		String trimmedDir = dir;
 		while (trimmedDir.startsWith("/") | trimmedDir.endsWith("\\"))
 			trimmedDir = trimmedDir.substring(1);
-		return (trimmedMain + "/" + trimmedDir).replace('\\', '/');
+		return combineCache.put(hash,
+				(trimmedMain + "/" + trimmedDir).replace('\\', '/'));
 	}
 
 	private void addResource(String path) {
@@ -274,5 +281,12 @@ public class NetworkClassLoader extends ClassLoader {
 			}
 		}
 		return url;
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO 自動生成されたメソッド・スタブ
+		return super.hashCode() ^ baseAddress.hashCode()
+				^ ((Boolean) delegate).hashCode();
 	}
 }
