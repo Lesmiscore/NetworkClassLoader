@@ -35,7 +35,7 @@ public class NetworkClassLoader extends ClassLoader {
 		Objects.requireNonNull(this.baseAddress = baseAddress);
 		this.delegate = delegate;
 		converter = rc == null ? ResourceConverter.NULL_CONVERTER : rc;
-		mLoader = ml == null ? ManifestLoader.NULL_LOADER : ml;
+		mLoader = ml == null ? ManifestLoader.JAVA_MANIFEST_LOADER : ml;
 		processML();
 	}
 

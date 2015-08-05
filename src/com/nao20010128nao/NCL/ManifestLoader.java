@@ -38,16 +38,11 @@ public abstract class ManifestLoader {
 		@Override
 		public void setSource(String dirName) throws IOException {
 			// TODO 自動生成されたメソッド・スタブ
-			throw new IOException("dummy error");
+
 		}
 	};
 
-	public static class SimpleJavaManifestLoader extends ManifestLoader {
-
-		public SimpleJavaManifestLoader() {
-
-		}
-
+	public static final ManifestLoader JAVA_MANIFEST_LOADER = new ManifestLoader() {
 		@Override
 		public List<String> getFilesList(BufferedReader reader,
 				InputStream original, String source) throws IOException {
@@ -76,7 +71,7 @@ public abstract class ManifestLoader {
 			// TODO 自動生成されたメソッド・スタブ
 
 		}
-	}
+	};
 
 	public static class SimpleLinesLoader extends ManifestLoader {
 		String dir;
