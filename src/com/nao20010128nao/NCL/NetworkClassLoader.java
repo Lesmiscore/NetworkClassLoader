@@ -252,14 +252,13 @@ public class NetworkClassLoader extends ClassLoader {
 		int hash = main.hashCode() ^ dir.hashCode();
 		if (combineCache.containsKey(hash))
 			return combineCache.get(hash);
-		String trimmedMain = main;
-		while (trimmedMain.endsWith("/") | trimmedMain.endsWith("\\"))
-			trimmedMain = trimmedMain.substring(0, trimmedMain.length() - 1);
-		String trimmedDir = dir;
-		while (trimmedDir.startsWith("/") | trimmedDir.startsWith("\\"))
-			trimmedDir = trimmedDir.substring(1);
-		return combineCache.put(hash,
-				(trimmedMain + "/" + trimmedDir).replace('\\', '/'));
+		String tm = main.replace('\\', '/');
+		while (tm.endsWith("/"))
+			tm = tm.substring(0, tm.length() - 1);
+		String td = dir.replace('\\', '/');
+		while (td.startsWith("/"))
+			td = td.substring(1);
+		return combineCache.put(hash, tm + "/" + td);
 	}
 
 	private void addResource(String path) {
